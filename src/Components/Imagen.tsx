@@ -12,6 +12,15 @@ export default function Imagen({
   height = "200px",
 }: ImagenProps) {
   return (
-    <img src={src} alt={alt} style={{ width, height }} />
+    <img
+      src={src}
+      alt={alt}
+      style={{
+        width,
+        height,
+        margin: "10px 0",
+        display: "block",
+      }}
+    />
   );
 }
