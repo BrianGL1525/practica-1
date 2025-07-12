@@ -8,6 +8,8 @@ import BotonReactstrap from '@/Components/BotonReactstrap';
 import Notificacion from '@/Components/Notificacion'; 
 import VentanaModal from '@/Components/VentanaModal';
 import Carrusel from '@/Components/Carrusel';
+import Iconos from '@/Components/Iconos';
+import TablaPersonalizada from '@/Components/TablaPersonalizada';
 
 export default function Home() {
   return (
@@ -40,6 +42,8 @@ export default function Home() {
       <Notificacion /> {}
       <VentanaModal />
       <Carrusel />
+      <Iconos />
+      <TablaPersonalizada />
     </main>
   );
 }

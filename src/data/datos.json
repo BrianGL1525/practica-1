@@ -1,0 +1,22 @@
+[
+  { "id": 1, "nombre": "Juan Pérez", "rol": "Desarrollador", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+1" },
+  { "id": 2, "nombre": "María Gómez", "rol": "Diseñadora", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+2" },
+  { "id": 3, "nombre": "Carlos Ruiz", "rol": "Tester", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+3" },
+  { "id": 4, "nombre": "Ana Torres", "rol": "Scrum Master", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+4" },
+  { "id": 5, "nombre": "Luis Sánchez", "rol": "DevOps", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+5" },
+  { "id": 6, "nombre": "Laura Ríos", "rol": "Analista", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+6" },
+  { "id": 7, "nombre": "Pedro Aguilar", "rol": "QA", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+7" },
+  { "id": 8, "nombre": "Lucía Herrera", "rol": "Project Manager", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+8" },
+  { "id": 9, "nombre": "Fernando Díaz", "rol": "Arquitecto", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+9" },
+  { "id": 10, "nombre": "Andrea Soto", "rol": "Frontend", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+10" },
+  { "id": 11, "nombre": "Diego Romero", "rol": "Backend", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+11" },
+  { "id": 12, "nombre": "Sofía Méndez", "rol": "Diseñadora UX", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+12" },
+  { "id": 13, "nombre": "Miguel Flores", "rol": "Ingeniero DevOps", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+13" },
+  { "id": 14, "nombre": "Claudia Pérez", "rol": "Líder Técnico", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+14" },
+  { "id": 15, "nombre": "Jorge Vázquez", "rol": "Arquitecto Cloud", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+15" },
+  { "id": 16, "nombre": "Natalia Rivas", "rol": "Tester QA", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+16" },
+  { "id": 17, "nombre": "Pablo Navarro", "rol": "Soporte TI", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+17" },
+  { "id": 18, "nombre": "Daniela Castro", "rol": "Product Owner", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+18" },
+  { "id": 19, "nombre": "José Martínez", "rol": "Consultor", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+19" },
+  { "id": 20, "nombre": "Valeria Jiménez", "rol": "Líder de proyecto", "icono": "user", "accion": "Acción", "imagen": "https://via.placeholder.com/300x200?text=Usuario+20" }
+]
