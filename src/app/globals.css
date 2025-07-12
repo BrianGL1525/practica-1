@@ -32,3 +32,8 @@ body {
   font-family: Arial, sans-serif;
 }
 
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(54%) sepia(98%) saturate(669%) hue-rotate(75deg) brightness(94%) contrast(97%);
+}
+
