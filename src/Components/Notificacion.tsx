@@ -20,7 +20,7 @@ export default function Notificacion() {
             Notificación
           </ToastHeader>
           <ToastBody>
-            ¡Este es un Toast azul usando Reactstrap!
+            ¡Este es un Toast el cual está usando Reactstrap!
           </ToastBody>
         </Toast>
       </div>

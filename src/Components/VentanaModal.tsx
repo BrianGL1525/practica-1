@@ -23,7 +23,7 @@ export default function VentanaModal() {
       <Modal isOpen={abierto} toggle={toggle}>
         <ModalHeader toggle={toggle}>Modal</ModalHeader>
         <ModalBody>
-          Este es el contenido del modal. 
+          Este tiene el contenido del modal. 
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={toggle}>

@@ -6,7 +6,7 @@ export default function CambiarFondo() {
   const [color, setColor] = useState('white');
 
   const cambiarColor = () => {
-    // Cambia entre blanco y azul claro
+    // Cambia entre blanco y un azul mas claro
     const nuevoColor = color === 'white' ? '#cce7ff' : 'white';
     setColor(nuevoColor);
   };
@@ -15,7 +15,7 @@ export default function CambiarFondo() {
     // Aplica el color al fondo del body
     document.body.style.backgroundColor = color;
 
-    // Limpieza (opcional)
+    // Limpieza en esta parte es opcional
     return () => {
       document.body.style.backgroundColor = '';
     };
