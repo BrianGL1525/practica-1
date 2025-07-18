@@ -13,6 +13,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  FormFeedback,
 } from 'reactstrap';
 
 export default function FormularioRegistro() {
@@ -30,11 +31,15 @@ export default function FormularioRegistro() {
   };
 
   const [formulario, setFormulario] = useState(estadoInicial);
-
-  // Estado donde guardaremos los datos cuando enviamos
   const [datosGuardados, setDatosGuardados] = useState<typeof estadoInicial | null>(null);
-
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [errores, setErrores] = useState({
+    nombre: '',
+    apellido: '',
+    email: '',
+    edad: '',
+    fechaRegistro: '',
+  });
 
   const manejarCambio = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -52,28 +57,87 @@ export default function FormularioRegistro() {
       nuevoValor = value;
     }
 
-    setFormulario({ ...formulario, [name]: nuevoValor });
+    setFormulario((prev) => ({ ...prev, [name]: nuevoValor }));
+
+    const nuevosErrores = { ...errores };
+
+    if (name === 'nombre') {
+      const regex = /^[A-Za-zÀ-ÿ\u00f1\u00d1\s]*$/;
+      nuevosErrores.nombre = regex.test(nuevoValor) && nuevoValor.trim() !== ''
+        ? ''
+        : 'Este campo solo acepta letras y espacios.';
+    }
+
+    if (name === 'apellido') {
+      const regex = /^[A-Za-zÀ-ÿ\u00f1\u00d1\s]*$/;
+      nuevosErrores.apellido = regex.test(nuevoValor) && nuevoValor.trim() !== ''
+        ? ''
+        : 'Este campo solo acepta letras y espacios.';
+    }
+
+    if (name === 'email') {
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      nuevosErrores.email = regex.test(nuevoValor)
+        ? ''
+        : 'Debe tener formato de correo electrónico válido.';
+    }
+
+    if (name === 'edad') {
+      const edadNum = Number(nuevoValor);
+      nuevosErrores.edad =
+        !isNaN(edadNum) && edadNum >= 1 && edadNum <= 100 && Number.isInteger(edadNum)
+          ? ''
+          : 'Este campo solo acepta números entre 1 y 100.';
+    }
+
+    if (name === 'fechaRegistro') {
+      const hoy = new Date();
+      const fechaSeleccionada = new Date(nuevoValor + 'T00:00:00');
+      hoy.setHours(0, 0, 0, 0);
+      nuevosErrores.fechaRegistro =
+        fechaSeleccionada >= hoy
+          ? ''
+          : 'No se permiten fechas anteriores al día de hoy.';
+    }
+
+    setErrores(nuevosErrores);
+  };
+
+  const validarFormulario = () => {
+    return (
+      errores.nombre === '' &&
+      errores.apellido === '' &&
+      errores.email === '' &&
+      errores.edad === '' &&
+      errores.fechaRegistro === ''
+    );
   };
 
   const manejarEnvio = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Guardar la info del formulario para mostrar en modal
+    if (!validarFormulario()) return;
     setDatosGuardados(formulario);
-
-    // Limpiar formulario
     setFormulario(estadoInicial);
-
-    // Cerrar modal si está abierto (opcional)
-    if (modalAbierto) setModalAbierto(false);
-
-    console.log('Formulario enviado:', formulario);
+    setErrores({
+      nombre: '',
+      apellido: '',
+      email: '',
+      edad: '',
+      fechaRegistro: '',
+    });
   };
 
   const toggleModal = () => setModalAbierto(!modalAbierto);
 
   const reiniciarFormulario = () => {
     setFormulario(estadoInicial);
+    setErrores({
+      nombre: '',
+      apellido: '',
+      email: '',
+      edad: '',
+      fechaRegistro: '',
+    });
   };
 
   return (
@@ -90,10 +154,14 @@ export default function FormularioRegistro() {
                 name="nombre"
                 value={formulario.nombre}
                 onChange={manejarCambio}
+                invalid={!!errores.nombre}
+                valid={formulario.nombre !== '' && !errores.nombre}
                 required
               />
+              <FormFeedback>{errores.nombre}</FormFeedback>
             </FormGroup>
           </Col>
+
           <Col md={6}>
             <FormGroup>
               <Label for="apellido">Apellido</Label>
@@ -103,8 +171,11 @@ export default function FormularioRegistro() {
                 name="apellido"
                 value={formulario.apellido}
                 onChange={manejarCambio}
+                invalid={!!errores.apellido}
+                valid={formulario.apellido !== '' && !errores.apellido}
                 required
               />
+              <FormFeedback>{errores.apellido}</FormFeedback>
             </FormGroup>
           </Col>
         </Row>
@@ -117,8 +188,11 @@ export default function FormularioRegistro() {
             name="email"
             value={formulario.email}
             onChange={manejarCambio}
+            invalid={!!errores.email}
+            valid={formulario.email !== '' && !errores.email}
             required
           />
+          <FormFeedback>{errores.email}</FormFeedback>
         </FormGroup>
 
         <FormGroup>
@@ -141,9 +215,11 @@ export default function FormularioRegistro() {
             name="edad"
             value={formulario.edad}
             onChange={manejarCambio}
-            min="0"
+            invalid={!!errores.edad}
+            valid={formulario.edad !== '' && !errores.edad}
             required
           />
+          <FormFeedback>{errores.edad}</FormFeedback>
         </FormGroup>
 
         <FormGroup tag="fieldset">
@@ -220,11 +296,13 @@ export default function FormularioRegistro() {
             name="fechaRegistro"
             value={formulario.fechaRegistro}
             onChange={manejarCambio}
+            invalid={!!errores.fechaRegistro}
+            valid={formulario.fechaRegistro !== '' && !errores.fechaRegistro}
             required
           />
+          <FormFeedback>{errores.fechaRegistro}</FormFeedback>
         </FormGroup>
 
-        {/* Botones */}
         <Button color="primary" type="submit" className="me-2">
           Enviar
         </Button>
@@ -238,7 +316,6 @@ export default function FormularioRegistro() {
         </Button>
       </Form>
 
-      {/* Modal */}
       <Modal isOpen={modalAbierto} toggle={toggleModal}>
         <ModalHeader toggle={toggleModal}>Datos del Formulario</ModalHeader>
         <ModalBody>
@@ -251,9 +328,9 @@ export default function FormularioRegistro() {
               <p><strong>Email:</strong> {datosGuardados.email}</p>
               <p><strong>Contraseña:</strong> {datosGuardados.contraseña}</p>
               <p><strong>Edad:</strong> {datosGuardados.edad}</p>
-              <p><strong>Género:</strong> {datosGuardados.genero === null ? 'No seleccionado' : datosGuardados.genero ? 'Masculino' : 'Femenino'}</p>
+              <p><strong>Género:</strong> {datosGuardados.genero ? 'Masculino' : 'Femenino'}</p>
               <p><strong>Rol:</strong> {datosGuardados.rol}</p>
-              <p><strong>Aceptó términos:</strong> {datosGuardados.opciones ? 'Sí' : 'No'}</p>
+              <p><strong>Términos:</strong> {datosGuardados.opciones ? 'Sí' : 'No'}</p>
               <p><strong>Notas:</strong> {datosGuardados.notas}</p>
               <p><strong>Fecha de registro:</strong> {datosGuardados.fechaRegistro}</p>
             </>
