@@ -14,6 +14,7 @@ import {
   ModalBody,
   ModalFooter,
   FormFeedback,
+  Table,
 } from 'reactstrap';
 
 export default function FormularioRegistro() {
@@ -32,7 +33,12 @@ export default function FormularioRegistro() {
 
   const [formulario, setFormulario] = useState(estadoInicial);
   const [datosGuardados, setDatosGuardados] = useState<typeof estadoInicial | null>(null);
+  const [registros, setRegistros] = useState<typeof estadoInicial[]>([]);
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
+  const [formularioEdicion, setFormularioEdicion] = useState(estadoInicial);
+  const [indiceEditar, setIndiceEditar] = useState<number | null>(null);
+
   const [errores, setErrores] = useState({
     nombre: '',
     apellido: '',
@@ -42,13 +48,13 @@ export default function FormularioRegistro() {
   });
 
   const manejarCambio = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    edicion = false
   ) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : false;
 
     let nuevoValor: any;
-
     if (type === 'checkbox') {
       nuevoValor = checked;
     } else if (name === 'genero') {
@@ -57,33 +63,33 @@ export default function FormularioRegistro() {
       nuevoValor = value;
     }
 
-    setFormulario((prev) => ({ ...prev, [name]: nuevoValor }));
+    const setFunc = edicion ? setFormularioEdicion : setFormulario;
+    const valores = edicion ? formularioEdicion : formulario;
 
+    setFunc({ ...valores, [name]: nuevoValor });
+
+    if (!edicion) validarCampo(name, nuevoValor);
+  };
+
+  const validarCampo = (name: string, valor: any) => {
     const nuevosErrores = { ...errores };
 
-    if (name === 'nombre') {
+    if (name === 'nombre' || name === 'apellido') {
       const regex = /^[A-Za-zÀ-ÿ\u00f1\u00d1\s]*$/;
-      nuevosErrores.nombre = regex.test(nuevoValor) && nuevoValor.trim() !== ''
-        ? ''
-        : 'Este campo solo acepta letras y espacios.';
-    }
-
-    if (name === 'apellido') {
-      const regex = /^[A-Za-zÀ-ÿ\u00f1\u00d1\s]*$/;
-      nuevosErrores.apellido = regex.test(nuevoValor) && nuevoValor.trim() !== ''
+      nuevosErrores[name] = regex.test(valor) && valor.trim() !== ''
         ? ''
         : 'Este campo solo acepta letras y espacios.';
     }
 
     if (name === 'email') {
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-      nuevosErrores.email = regex.test(nuevoValor)
+      nuevosErrores.email = regex.test(valor)
         ? ''
         : 'Debe tener formato de correo electrónico válido.';
     }
 
     if (name === 'edad') {
-      const edadNum = Number(nuevoValor);
+      const edadNum = Number(valor);
       nuevosErrores.edad =
         !isNaN(edadNum) && edadNum >= 1 && edadNum <= 100 && Number.isInteger(edadNum)
           ? ''
@@ -92,7 +98,7 @@ export default function FormularioRegistro() {
 
     if (name === 'fechaRegistro') {
       const hoy = new Date();
-      const fechaSeleccionada = new Date(nuevoValor + 'T00:00:00');
+      const fechaSeleccionada = new Date(valor + 'T00:00:00');
       hoy.setHours(0, 0, 0, 0);
       nuevosErrores.fechaRegistro =
         fechaSeleccionada >= hoy
@@ -104,19 +110,14 @@ export default function FormularioRegistro() {
   };
 
   const validarFormulario = () => {
-    return (
-      errores.nombre === '' &&
-      errores.apellido === '' &&
-      errores.email === '' &&
-      errores.edad === '' &&
-      errores.fechaRegistro === ''
-    );
+    return Object.values(errores).every((v) => v === '');
   };
 
   const manejarEnvio = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validarFormulario()) return;
     setDatosGuardados(formulario);
+    setRegistros((prev) => [...prev, formulario]);
     setFormulario(estadoInicial);
     setErrores({
       nombre: '',
@@ -140,6 +141,26 @@ export default function FormularioRegistro() {
     });
   };
 
+  const eliminarRegistro = (index: number) => {
+    const nuevosRegistros = registros.filter((_, i) => i !== index);
+    setRegistros(nuevosRegistros);
+  };
+
+  const abrirModalEditar = (index: number) => {
+    setIndiceEditar(index);
+    setFormularioEdicion(registros[index]);
+    setModalEditarAbierto(true);
+  };
+
+  const guardarEdicion = () => {
+    if (indiceEditar === null) return;
+    const nuevosRegistros = [...registros];
+    nuevosRegistros[indiceEditar] = formularioEdicion;
+    setRegistros(nuevosRegistros);
+    setModalEditarAbierto(false);
+    setIndiceEditar(null);
+  };
+
   return (
     <div className="p-4">
       <h2 className="mb-4 text-primary">Formulario de Registro</h2>
@@ -161,7 +182,6 @@ export default function FormularioRegistro() {
               <FormFeedback>{errores.nombre}</FormFeedback>
             </FormGroup>
           </Col>
-
           <Col md={6}>
             <FormGroup>
               <Label for="apellido">Apellido</Label>
@@ -303,43 +323,98 @@ export default function FormularioRegistro() {
           <FormFeedback>{errores.fechaRegistro}</FormFeedback>
         </FormGroup>
 
-        <Button color="primary" type="submit" className="me-2">
-          Enviar
-        </Button>
-
-        <Button color="info" type="button" onClick={toggleModal} className="me-2">
-          Mostrar
-        </Button>
-
-        <Button color="secondary" type="button" onClick={reiniciarFormulario}>
-          Reiniciar
-        </Button>
+        <Button color="primary" type="submit" className="me-2">Guardar</Button>
+        <Button color="info" type="button" onClick={toggleModal} className="me-2">Mostrar</Button>
+        <Button color="secondary" type="button" onClick={reiniciarFormulario}>Reiniciar</Button>
       </Form>
 
+      {/* Tabla de registros */}
+      {registros.length > 0 && (
+        <div className="mt-5">
+          <h4>Registros guardados:</h4>
+          <Table bordered striped>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Edad</th>
+                <th>Género</th>
+                <th>Rol</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {registros.map((r, i) => (
+                <tr key={i}>
+                  <td>{i + 1}</td>
+                  <td>{r.nombre}</td>
+                  <td>{r.apellido}</td>
+                  <td>{r.email}</td>
+                  <td>{r.edad}</td>
+                  <td>{r.genero ? 'Masculino' : 'Femenino'}</td>
+                  <td>{r.rol}</td>
+                  <td>{r.fechaRegistro}</td>
+                  <td>
+                    <Button color="warning" size="sm" onClick={() => abrirModalEditar(i)} className="me-2">
+                      ✏️
+                    </Button>
+                    <Button color="danger" size="sm" onClick={() => eliminarRegistro(i)}>
+                      🗑️
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      )}
+
+      {/* Modal para mostrar datos */}
       <Modal isOpen={modalAbierto} toggle={toggleModal}>
-        <ModalHeader toggle={toggleModal}>Datos del Formulario</ModalHeader>
+        <ModalHeader toggle={toggleModal}>Datos del Último Registro</ModalHeader>
         <ModalBody>
-          {!datosGuardados ? (
-            <p>No hay datos para mostrar.</p>
-          ) : (
+          {datosGuardados ? (
             <>
               <p><strong>Nombre:</strong> {datosGuardados.nombre}</p>
               <p><strong>Apellido:</strong> {datosGuardados.apellido}</p>
               <p><strong>Email:</strong> {datosGuardados.email}</p>
-              <p><strong>Contraseña:</strong> {datosGuardados.contraseña}</p>
               <p><strong>Edad:</strong> {datosGuardados.edad}</p>
               <p><strong>Género:</strong> {datosGuardados.genero ? 'Masculino' : 'Femenino'}</p>
               <p><strong>Rol:</strong> {datosGuardados.rol}</p>
-              <p><strong>Términos:</strong> {datosGuardados.opciones ? 'Sí' : 'No'}</p>
-              <p><strong>Notas:</strong> {datosGuardados.notas}</p>
-              <p><strong>Fecha de registro:</strong> {datosGuardados.fechaRegistro}</p>
+              <p><strong>Fecha:</strong> {datosGuardados.fechaRegistro}</p>
             </>
+          ) : (
+            <p>No hay datos guardados aún.</p>
           )}
         </ModalBody>
         <ModalFooter>
-          <Button color="secondary" onClick={toggleModal}>
-            Cerrar
-          </Button>
+          <Button onClick={toggleModal}>Cerrar</Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* Modal para editar */}
+      <Modal isOpen={modalEditarAbierto} toggle={() => setModalEditarAbierto(false)}>
+        <ModalHeader toggle={() => setModalEditarAbierto(false)}>Editar Registro</ModalHeader>
+        <ModalBody>
+          <Form>
+            <FormGroup>
+              <Label for="nombre">Nombre</Label>
+              <Input
+                type="text"
+                name="nombre"
+                value={formularioEdicion.nombre}
+                onChange={(e) => manejarCambio(e, true)}
+              />
+            </FormGroup>
+            {/* Agrega aquí los demás campos si quieres editarlos todos */}
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={guardarEdicion}>Guardar</Button>
+          <Button onClick={() => setModalEditarAbierto(false)}>Cancelar</Button>
         </ModalFooter>
       </Modal>
     </div>
