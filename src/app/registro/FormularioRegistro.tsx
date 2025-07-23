@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+
+
 import {
   Form,
   FormGroup,
@@ -251,7 +254,9 @@ const manejarEnvio = (e: React.FormEvent) => {
         <Button color="primary" type="submit" className="me-2">Guardar</Button>
         <Button color="info" type="button" onClick={toggleModal} className="me-2">Mostrar</Button>
         <Button color="secondary" type="button" onClick={reiniciarFormulario} className="me-2">Reiniciar</Button>
-        <Button color="success" type="button" onClick={obtenerUsuarioAleatorio}>Obtener Usuario Aleatorio</Button>
+        <Button color="success" type="button" onClick={obtenerUsuarioAleatorio} className="me-2">Obtener Usuario Aleatorio</Button>
+        <Button color="warning" tag={Link} href="/productos">Ver Productos</Button>
+
       </Form>
 
       {usuarioAleatorio && (
@@ -279,7 +284,6 @@ const manejarEnvio = (e: React.FormEvent) => {
             {`${usuarioAleatorio.location.postcode}`}
           </CardFooter>
         </Card>
-        
       )}
     </div>
   );
