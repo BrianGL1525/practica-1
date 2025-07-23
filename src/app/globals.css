@@ -37,3 +37,7 @@ body {
   filter: invert(54%) sepia(98%) saturate(669%) hue-rotate(75deg) brightness(94%) contrast(97%);
 }
 
+body {
+  background-color: #f5f5f5; /* Fondo claro */
+  color: #000000;            /* Texto negro */
+}

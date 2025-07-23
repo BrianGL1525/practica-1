@@ -15,6 +15,11 @@ import {
   ModalFooter,
   FormFeedback,
   Table,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  CardImg,
 } from 'reactstrap';
 
 export default function FormularioRegistro() {
@@ -38,6 +43,7 @@ export default function FormularioRegistro() {
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
   const [formularioEdicion, setFormularioEdicion] = useState(estadoInicial);
   const [indiceEditar, setIndiceEditar] = useState<number | null>(null);
+  const [usuarioAleatorio, setUsuarioAleatorio] = useState<any | null>(null);
 
   const [errores, setErrores] = useState({
     nombre: '',
@@ -75,7 +81,7 @@ export default function FormularioRegistro() {
     const nuevosErrores = { ...errores };
 
     if (name === 'nombre' || name === 'apellido') {
-      const regex = /^[A-Za-zÀ-ÿ\u00f1\u00d1\s]*$/;
+      const regex = /^[A-Za-zÀ-ÿ\s]*$/;
       nuevosErrores[name] = regex.test(valor) && valor.trim() !== ''
         ? ''
         : 'Este campo solo acepta letras y espacios.';
@@ -93,7 +99,7 @@ export default function FormularioRegistro() {
       nuevosErrores.edad =
         !isNaN(edadNum) && edadNum >= 1 && edadNum <= 100 && Number.isInteger(edadNum)
           ? ''
-          : 'Este campo solo acepta números entre 1 y 100.';
+          : 'Solo números entre 1 y 100.';
     }
 
     if (name === 'fechaRegistro') {
@@ -101,9 +107,7 @@ export default function FormularioRegistro() {
       const fechaSeleccionada = new Date(valor + 'T00:00:00');
       hoy.setHours(0, 0, 0, 0);
       nuevosErrores.fechaRegistro =
-        fechaSeleccionada >= hoy
-          ? ''
-          : 'No se permiten fechas anteriores al día de hoy.';
+        fechaSeleccionada >= hoy ? '' : 'No se permiten fechas pasadas.';
     }
 
     setErrores(nuevosErrores);
@@ -113,32 +117,27 @@ export default function FormularioRegistro() {
     return Object.values(errores).every((v) => v === '');
   };
 
-  const manejarEnvio = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validarFormulario()) return;
-    setDatosGuardados(formulario);
-    setRegistros((prev) => [...prev, formulario]);
-    setFormulario(estadoInicial);
-    setErrores({
-      nombre: '',
-      apellido: '',
-      email: '',
-      edad: '',
-      fechaRegistro: '',
-    });
-  };
+const manejarEnvio = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!validarFormulario()) return;
+
+  setDatosGuardados(formulario); //  Se actualiza 
+  setRegistros((prev) => [...prev, formulario]);
+  setFormulario(estadoInicial);
+  setErrores({
+    nombre: '',
+    apellido: '',
+    email: '',
+    edad: '',
+    fechaRegistro: '',
+  });
+};
 
   const toggleModal = () => setModalAbierto(!modalAbierto);
 
   const reiniciarFormulario = () => {
     setFormulario(estadoInicial);
-    setErrores({
-      nombre: '',
-      apellido: '',
-      email: '',
-      edad: '',
-      fechaRegistro: '',
-    });
+    setErrores({ nombre: '', apellido: '', email: '', edad: '', fechaRegistro: '' });
   };
 
   const eliminarRegistro = (index: number) => {
@@ -161,6 +160,16 @@ export default function FormularioRegistro() {
     setIndiceEditar(null);
   };
 
+  const obtenerUsuarioAleatorio = async () => {
+    try {
+      const res = await fetch('https://randomuser.me/api/');
+      const data = await res.json();
+      setUsuarioAleatorio(data.results[0]);
+    } catch (error) {
+      console.error('Error al obtener usuario aleatorio:', error);
+    }
+  };
+
   return (
     <div className="p-4">
       <h2 className="mb-4 text-primary">Formulario de Registro</h2>
@@ -169,32 +178,14 @@ export default function FormularioRegistro() {
           <Col md={6}>
             <FormGroup>
               <Label for="nombre">Nombre</Label>
-              <Input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value={formulario.nombre}
-                onChange={manejarCambio}
-                invalid={!!errores.nombre}
-                valid={formulario.nombre !== '' && !errores.nombre}
-                required
-              />
+              <Input type="text" id="nombre" name="nombre" value={formulario.nombre} onChange={manejarCambio} invalid={!!errores.nombre} required />
               <FormFeedback>{errores.nombre}</FormFeedback>
             </FormGroup>
           </Col>
           <Col md={6}>
             <FormGroup>
               <Label for="apellido">Apellido</Label>
-              <Input
-                type="text"
-                id="apellido"
-                name="apellido"
-                value={formulario.apellido}
-                onChange={manejarCambio}
-                invalid={!!errores.apellido}
-                valid={formulario.apellido !== '' && !errores.apellido}
-                required
-              />
+              <Input type="text" id="apellido" name="apellido" value={formulario.apellido} onChange={manejarCambio} invalid={!!errores.apellido} required />
               <FormFeedback>{errores.apellido}</FormFeedback>
             </FormGroup>
           </Col>
@@ -202,81 +193,36 @@ export default function FormularioRegistro() {
 
         <FormGroup>
           <Label for="email">Email</Label>
-          <Input
-            type="email"
-            id="email"
-            name="email"
-            value={formulario.email}
-            onChange={manejarCambio}
-            invalid={!!errores.email}
-            valid={formulario.email !== '' && !errores.email}
-            required
-          />
+          <Input type="email" id="email" name="email" value={formulario.email} onChange={manejarCambio} invalid={!!errores.email} required />
           <FormFeedback>{errores.email}</FormFeedback>
         </FormGroup>
 
         <FormGroup>
           <Label for="contraseña">Contraseña</Label>
-          <Input
-            type="password"
-            id="contraseña"
-            name="contraseña"
-            value={formulario.contraseña}
-            onChange={manejarCambio}
-            required
-          />
+          <Input type="password" id="contraseña" name="contraseña" value={formulario.contraseña} onChange={manejarCambio} required />
         </FormGroup>
 
         <FormGroup>
           <Label for="edad">Edad</Label>
-          <Input
-            type="number"
-            id="edad"
-            name="edad"
-            value={formulario.edad}
-            onChange={manejarCambio}
-            invalid={!!errores.edad}
-            valid={formulario.edad !== '' && !errores.edad}
-            required
-          />
+          <Input type="number" id="edad" name="edad" value={formulario.edad} onChange={manejarCambio} invalid={!!errores.edad} required />
           <FormFeedback>{errores.edad}</FormFeedback>
         </FormGroup>
 
         <FormGroup tag="fieldset">
           <legend>Género</legend>
           <FormGroup check>
-            <Input
-              type="radio"
-              name="genero"
-              value="true"
-              onChange={manejarCambio}
-              checked={formulario.genero === true}
-              required
-            />
+            <Input type="radio" name="genero" value="true" onChange={manejarCambio} checked={formulario.genero === true} required />
             <Label check>Masculino</Label>
           </FormGroup>
           <FormGroup check>
-            <Input
-              type="radio"
-              name="genero"
-              value="false"
-              onChange={manejarCambio}
-              checked={formulario.genero === false}
-            />
+            <Input type="radio" name="genero" value="false" onChange={manejarCambio} checked={formulario.genero === false} />
             <Label check>Femenino</Label>
           </FormGroup>
         </FormGroup>
 
         <FormGroup>
           <Label for="rol">Rol</Label>
-          <Input
-            type="select"
-            id="rol"
-            name="rol"
-            value={formulario.rol}
-            onChange={manejarCambio}
-            required
-          >
+          <Input type="select" id="rol" name="rol" value={formulario.rol} onChange={manejarCambio} required>
             <option value="">Seleccione</option>
             <option value="Admin">Admin</option>
             <option value="Usuario">Usuario</option>
@@ -284,14 +230,8 @@ export default function FormularioRegistro() {
           </Input>
         </FormGroup>
 
-        <FormGroup check className="mb-3">
-          <Input
-            type="checkbox"
-            id="opciones"
-            name="opciones"
-            checked={formulario.opciones}
-            onChange={manejarCambio}
-          />
+        <FormGroup check>
+          <Input type="checkbox" id="opciones" name="opciones" checked={formulario.opciones} onChange={manejarCambio} />
           <Label for="opciones" check>
             Acepto los términos y condiciones
           </Label>
@@ -299,124 +239,48 @@ export default function FormularioRegistro() {
 
         <FormGroup>
           <Label for="notas">Notas</Label>
-          <Input
-            type="textarea"
-            id="notas"
-            name="notas"
-            value={formulario.notas}
-            onChange={manejarCambio}
-          />
+          <Input type="textarea" id="notas" name="notas" value={formulario.notas} onChange={manejarCambio} />
         </FormGroup>
 
         <FormGroup>
           <Label for="fechaRegistro">Fecha de registro</Label>
-          <Input
-            type="date"
-            id="fechaRegistro"
-            name="fechaRegistro"
-            value={formulario.fechaRegistro}
-            onChange={manejarCambio}
-            invalid={!!errores.fechaRegistro}
-            valid={formulario.fechaRegistro !== '' && !errores.fechaRegistro}
-            required
-          />
+          <Input type="date" id="fechaRegistro" name="fechaRegistro" value={formulario.fechaRegistro} onChange={manejarCambio} invalid={!!errores.fechaRegistro} required />
           <FormFeedback>{errores.fechaRegistro}</FormFeedback>
         </FormGroup>
 
         <Button color="primary" type="submit" className="me-2">Guardar</Button>
         <Button color="info" type="button" onClick={toggleModal} className="me-2">Mostrar</Button>
-        <Button color="secondary" type="button" onClick={reiniciarFormulario}>Reiniciar</Button>
+        <Button color="secondary" type="button" onClick={reiniciarFormulario} className="me-2">Reiniciar</Button>
+        <Button color="success" type="button" onClick={obtenerUsuarioAleatorio}>Obtener Usuario Aleatorio</Button>
       </Form>
 
-      {/* Tabla de registros */}
-      {registros.length > 0 && (
-        <div className="mt-5">
-          <h4>Registros guardados:</h4>
-          <Table bordered striped>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Email</th>
-                <th>Edad</th>
-                <th>Género</th>
-                <th>Rol</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {registros.map((r, i) => (
-                <tr key={i}>
-                  <td>{i + 1}</td>
-                  <td>{r.nombre}</td>
-                  <td>{r.apellido}</td>
-                  <td>{r.email}</td>
-                  <td>{r.edad}</td>
-                  <td>{r.genero ? 'Masculino' : 'Femenino'}</td>
-                  <td>{r.rol}</td>
-                  <td>{r.fechaRegistro}</td>
-                  <td>
-                    <Button color="warning" size="sm" onClick={() => abrirModalEditar(i)} className="me-2">
-                      ✏️
-                    </Button>
-                    <Button color="danger" size="sm" onClick={() => eliminarRegistro(i)}>
-                      🗑️
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
+      {usuarioAleatorio && (
+        <Card className="mt-4">
+          <CardHeader className="bg-primary text-white">
+            {`${usuarioAleatorio.name.title} ${usuarioAleatorio.name.first} ${usuarioAleatorio.name.last}`}
+          </CardHeader>
+          <CardBody className="text-center">
+            <CardImg
+              src={usuarioAleatorio.picture.large}
+              alt="Foto del usuario"
+              className="img-thumbnail mb-3"
+              style={{ maxWidth: '150px' }}
+            />
+            <p><strong>Email:</strong> {usuarioAleatorio.email}</p>
+            <p><strong>Teléfono:</strong> {usuarioAleatorio.phone}</p>
+            <p><strong>Edad:</strong> {usuarioAleatorio.dob.age}</p>
+            <p><strong>Género:</strong> {usuarioAleatorio.gender === 'male' ? 'Masculino' : 'Femenino'}</p>
+            <p><strong>País:</strong> {usuarioAleatorio.location.country}</p>
+          </CardBody>
+          <CardFooter>
+            <strong>Dirección:</strong><br />
+            {`${usuarioAleatorio.location.street.number} ${usuarioAleatorio.location.street.name}, `}
+            {`${usuarioAleatorio.location.city}, ${usuarioAleatorio.location.state}, `}
+            {`${usuarioAleatorio.location.postcode}`}
+          </CardFooter>
+        </Card>
+        
       )}
-
-      {/* Modal para mostrar datos */}
-      <Modal isOpen={modalAbierto} toggle={toggleModal}>
-        <ModalHeader toggle={toggleModal}>Datos del Último Registro</ModalHeader>
-        <ModalBody>
-          {datosGuardados ? (
-            <>
-              <p><strong>Nombre:</strong> {datosGuardados.nombre}</p>
-              <p><strong>Apellido:</strong> {datosGuardados.apellido}</p>
-              <p><strong>Email:</strong> {datosGuardados.email}</p>
-              <p><strong>Edad:</strong> {datosGuardados.edad}</p>
-              <p><strong>Género:</strong> {datosGuardados.genero ? 'Masculino' : 'Femenino'}</p>
-              <p><strong>Rol:</strong> {datosGuardados.rol}</p>
-              <p><strong>Fecha:</strong> {datosGuardados.fechaRegistro}</p>
-            </>
-          ) : (
-            <p>No hay datos guardados aún.</p>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={toggleModal}>Cerrar</Button>
-        </ModalFooter>
-      </Modal>
-
-      {/* Modal para editar */}
-      <Modal isOpen={modalEditarAbierto} toggle={() => setModalEditarAbierto(false)}>
-        <ModalHeader toggle={() => setModalEditarAbierto(false)}>Editar Registro</ModalHeader>
-        <ModalBody>
-          <Form>
-            <FormGroup>
-              <Label for="nombre">Nombre</Label>
-              <Input
-                type="text"
-                name="nombre"
-                value={formularioEdicion.nombre}
-                onChange={(e) => manejarCambio(e, true)}
-              />
-            </FormGroup>
-            {/* Agrega aquí los demás campos si quieres editarlos todos */}
-          </Form>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={guardarEdicion}>Guardar</Button>
-          <Button onClick={() => setModalEditarAbierto(false)}>Cancelar</Button>
-        </ModalFooter>
-      </Modal>
     </div>
   );
 }
